@@ -6,7 +6,6 @@ utility_target: activity
 privacy_target: identity
 split:
   test_size: 0.20
-  validation_size: 0.20
   group_column: session
 benchmarks:
   attackers: [logistic_regression, random_forest, mlp]

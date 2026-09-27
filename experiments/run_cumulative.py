@@ -1,7 +1,7 @@
 from pathlib import Path
-import argparse,sys,time
+import argparse,sys,time,json
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-import numpy as np,pandas as pd
+import numpy as np,pandas as pd,yaml
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import make_pipeline
@@ -13,16 +13,24 @@ from src.privacy import sanitize,aggregate_releases
 from src.metrics import macro_auc
 from src.risk_gate import GateThresholds,release_decision
 
-p=argparse.ArgumentParser(); p.add_argument("--csv"); p.add_argument("--sanitizer",default="none",choices=["none","noise","quantize","clip"]); p.add_argument("--strength",type=float,default=.25); p.add_argument("--seed",type=int,default=42); a=p.parse_args()
-if a.csv: X,yt,yi=load_feature_csv(a.csv)
-else: X,yt,yi=make_synthetic_rf(n_samples=6000,seed=a.seed)
-idx=np.arange(len(X)); tr,te=train_test_split(idx,test_size=.35,random_state=a.seed,stratify=yt)
-Xs=sanitize(X,a.sanitizer,a.strength,a.seed)
-utility=make_pipeline(StandardScaler(),LogisticRegression(max_iter=2000)); utility.fit(Xs[tr],yt[tr]); uf1=f1_score(yt[te],utility.predict(Xs[te]),average="macro")
+p=argparse.ArgumentParser(); p.add_argument("--csv"); p.add_argument("--config",default="configs/baseline.yaml"); p.add_argument("--sanitizer",default="none",choices=["none","noise","quantize","clip"]); p.add_argument("--strength",type=float,default=.25); p.add_argument("--seed",type=int); a=p.parse_args()
+with open(a.config,"r",encoding="utf-8") as h: cfg=yaml.safe_load(h)
+seed=a.seed if a.seed is not None else int(cfg["seed"])
+np.random.seed(seed)
+if a.csv: X,yt,yi=load_feature_csv(a.csv); source=str(a.csv)
+else:
+ X,yt,yi=make_synthetic_rf(n_samples=int(cfg["n_samples"]),n_features=int(cfg["n_features"]),n_activities=int(cfg["n_activities"]),n_identities=int(cfg["n_identities"]),seed=seed); source="synthetic-smoke-test"
+idx=np.arange(len(X)); tr,te=train_test_split(idx,test_size=.35,random_state=seed,stratify=yt)
+Xs=sanitize(X,a.sanitizer,a.strength,seed)
+utility=make_pipeline(StandardScaler(),LogisticRegression(max_iter=2000,random_state=seed)); utility.fit(Xs[tr],yt[tr]); uf1=f1_score(yt[te],utility.predict(Xs[te]),average="macro")
+t=GateThresholds(allow_auc_max=float(cfg["privacy"]["allow_auc_max"]),block_auc_min=float(cfg["privacy"]["block_auc_min"]),min_utility_f1=float(cfg["utility"]["min_macro_f1"]))
 rows=[]
-for k in [1,2,5,10,20]:
-    Xtr,ytr=aggregate_releases(Xs[tr],yi[tr],k); Xte,yte=aggregate_releases(Xs[te],yi[te],k)
-    if len(np.unique(ytr))<2 or len(yte)<10: continue
-    t0=time.perf_counter(); atk=make_pipeline(StandardScaler(),LogisticRegression(max_iter=2000)); atk.fit(Xtr,ytr); prob=atk.predict_proba(Xte); auc=macro_auc(yte,prob,atk.classes_); ms=(time.perf_counter()-t0)*1000
-    rows.append({"release_count":k,"sanitizer":a.sanitizer,"strength":a.strength,"utility_macro_f1":uf1,"identity_macro_auc":auc,"decision":release_decision(auc,uf1,GateThresholds()),"attack_fit_eval_ms":ms})
-out=Path("outputs"); out.mkdir(exist_ok=True); df=pd.DataFrame(rows); df.to_csv(out/f"cumulative_{a.sanitizer}.csv",index=False); print(df.to_string(index=False))
+for k in cfg["release_counts"]:
+ Xtr,ytr=aggregate_releases(Xs[tr],yi[tr],int(k)); Xte,yte=aggregate_releases(Xs[te],yi[te],int(k))
+ if len(np.unique(ytr))<2 or len(yte)<10: continue
+ t0=time.perf_counter(); atk=make_pipeline(StandardScaler(),LogisticRegression(max_iter=2000,random_state=seed)); atk.fit(Xtr,ytr); prob=atk.predict_proba(Xte); auc=macro_auc(yte,prob,atk.classes_); ms=(time.perf_counter()-t0)*1000
+ rows.append({"release_count":int(k),"sanitizer":a.sanitizer,"strength":a.strength,"utility_macro_f1":uf1,"identity_macro_auc":auc,"decision":release_decision(auc,uf1,t),"attack_fit_eval_ms":ms})
+out=Path("outputs"); out.mkdir(exist_ok=True); df=pd.DataFrame(rows); stem=f"cumulative_{a.sanitizer}"; df.to_csv(out/f"{stem}.csv",index=False)
+meta={"source":source,"seed":seed,"config":a.config,"sanitizer":a.sanitizer,"strength":a.strength,"n_samples":int(len(X)),"n_features":int(X.shape[1]),"release_counts":list(map(int,cfg["release_counts"])),"thresholds":{"allow_auc_max":t.allow_auc_max,"block_auc_min":t.block_auc_min,"min_utility_f1":t.min_utility_f1}}
+(out/f"{stem}.metadata.json").write_text(json.dumps(meta,indent=2),encoding="utf-8")
+print(df.to_string(index=False)); print("metadata:",out/f"{stem}.metadata.json")

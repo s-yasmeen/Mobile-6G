@@ -46,3 +46,7 @@ No universal AUC value is declared privacy-safe. Statistical evidence is measure
 - independent-dataset sanity check where labels permit;
 - CI tests for adapters, splitting, metrics and benchmark runner;
 - no synthetic observations in headline Phase 2 result tables.
+
+
+### WiMANS — executable joint-label benchmark
+WiMANS is added as an executable Phase-2 dataset because its official release provides preprocessed CSI amplitude samples and annotations for identity, location and activity on the same benchmark corpus. Activity is the utility target and anonymized user identity is the privacy target. Results must be reported as Wi-Fi CSI evidence for next-generation sensing privacy, not mislabeled as native 6G measurements. OPERAnet and mmHSense retain their independent-validation/ISAC roles.

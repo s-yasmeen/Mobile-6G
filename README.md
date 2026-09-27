@@ -1,28 +1,60 @@
-# Mobile-6G: Cumulative Privacy Leakage Experiments
+# Mobile-6G — Cumulative Privacy Leakage Assurance
 
-Research code for **risk-adaptive privacy assurance in next-generation mobile/ISAC networks**.
+Experimental prototype for studying **cumulative identity leakage from repeated RF/ISAC releases** and risk-adaptive ALLOW / SANITIZE / BLOCK control in next-generation mobile sensing networks.
 
-## Research hypothesis
-Repeated observations that appear acceptable individually can accumulate enough information to increase identity inference risk.
+> Research status: the software pipeline is implemented and reproducible. Synthetic data is used only for smoke testing; scientific conclusions require experiments on real datasets such as mmHSense and OPERAnet.
 
-## Pipeline
-1. Load RF/ISAC features and labels.
-2. Train a utility classifier (e.g. activity/gesture).
-3. Train an identity attacker.
-4. Aggregate repeated releases at K = 1, 2, 5, 10, 20 observations.
-5. Estimate cumulative privacy leakage.
-6. Apply an ALLOW / SANITIZE / BLOCK release policy.
-7. Report utility, privacy leakage, and policy decisions.
+## Hypothesis
+A release that is acceptable in isolation may become privacy-sensitive when an adversary combines repeated observations.
 
-## Quick start
+## Architecture
+RF/ISAC input → task utility → sanitizer → repeated-release aggregation → identity attacker → cumulative privacy score → risk gate.
+
+## Reproduce
 ```bash
 python -m venv .venv
-source .venv/bin/activate   # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
+source .venv/bin/activate
+pip install -r requirements.txt pytest
+pytest -q
 python experiments/run_smoke_test.py
+python experiments/run_cumulative.py --sanitizer none
+python experiments/run_cumulative.py --sanitizer noise --strength 0.25
+python experiments/run_cumulative.py --sanitizer quantize --strength 0.25
+python experiments/plot_results.py
 ```
 
-The smoke test uses synthetic data only. Public dataset adapters for mmHSense and OPERAnet are planned next; dataset files should not be committed to Git.
+Windows activation: `.venv\\Scripts\\activate`.
 
-## Status
-Phase 1: reproducible baseline scaffold.
+## Real dataset input
+Export extracted RF/ISAC windows to a feature CSV containing `identity`, `activity`, and numeric features, then run:
+```bash
+python experiments/run_cumulative.py --csv data/processed/features.csv --sanitizer none
+```
+See `data/README.md` for the contract. Raw third-party datasets are deliberately excluded.
+
+## Outputs
+- utility macro-F1
+- identity attacker macro one-vs-rest ROC-AUC
+- decision: ALLOW / SANITIZE / BLOCK
+- attack runtime
+- privacy-vs-release-count CSVs and plot
+
+## Research questions
+1. Does identity leakage increase as repeated observations accumulate?
+2. Can cumulative leakage drive adaptive release decisions?
+3. What privacy–utility trade-off results from sanitization?
+4. What computational overhead is introduced?
+
+## Repository map
+- `src/`: data, privacy, metrics, risk gate, synthetic validation
+- `experiments/`: runnable experiments and plotting
+- `configs/`: baseline thresholds/configuration
+- `tests/`: core unit tests
+- `docs/EXPERIMENT_PLAN.md`: publication-oriented protocol
+- `.github/workflows/ci.yml`: reproducibility checks
+
+## Scientific caution
+Do not describe Wi-Fi/5G measurements as native 6G data. They are RF/ISAC validation datasets for a framework motivated by next-generation mobile networks. Report dataset-specific protocols, subject/session splits, confidence intervals, and all privacy/utility thresholds in the manuscript.
+
+## License
+MIT.

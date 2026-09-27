@@ -55,3 +55,19 @@ def permutation_baseline(model_factory,Xtr,ytr,Xte,yte,n=200,seed=42,privacy=Fal
         a=np.array([r[metric] for r in vals if metric in r and np.isfinite(r[metric])])
         if len(a): out[f"permutation_{metric}_mean"]=float(a.mean()); out[f"permutation_{metric}_p95"]=float(np.quantile(a,.95))
     return out
+
+
+def group_bootstrap_metrics(y,pred,groups,prob=None,classes=None,n=1000,confidence=.95,seed=42):
+    """Cluster bootstrap: resample whole sessions/experiments, not correlated windows."""
+    rng=np.random.default_rng(seed); y=np.asarray(y); pred=np.asarray(pred); groups=np.asarray(groups); unique=np.unique(groups)
+    stats={"macro_f1":[],"balanced_accuracy":[],"macro_ovr_auc":[]}
+    for _ in range(n):
+        sampled=rng.choice(unique,size=len(unique),replace=True); ix=np.concatenate([np.flatnonzero(groups==g) for g in sampled]); yy=y[ix]; pp=pred[ix]
+        stats["macro_f1"].append(f1_score(yy,pp,average="macro")); stats["balanced_accuracy"].append(balanced_accuracy_score(yy,pp))
+        if prob is not None and len(np.unique(yy))>1:
+            try: stats["macro_ovr_auc"].append(_macro_auc(yy,prob[ix],classes))
+            except ValueError: pass
+    alpha=(1-confidence)/2; out={}
+    for k,v in stats.items():
+        if v: out[k+"_ci_low"]=float(np.quantile(v,alpha)); out[k+"_ci_high"]=float(np.quantile(v,1-alpha))
+    return out

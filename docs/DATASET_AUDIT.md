@@ -19,3 +19,7 @@ Every experiment must record dataset name/version/source, modality, preprocessin
 
 ## Decision gate
 If mmHSense does not expose aligned utility and identity labels for the same observations, it remains the ISAC benchmark but will not be forced into an invalid dual-label experiment. OPERAnet can serve as the principal dual-label privacy/utility study because participant and activity metadata are available together. This decision must be made from the downloaded data schema, not assumption.
+
+
+## OPERAnet schema verification (official Data Descriptor)
+The Wi-Fi CSI directories wificsi1/wificsi2 store one experiment per MAT file. Each row is a received packet and includes timestamp, activity, exp_no, person_id, room_no and 270 complex CSI fields from the 3x3 MIMO x 30-subcarrier configuration. This directly supports activity as the utility label, person_id as the privacy label, and exp_no as the grouping unit. Raw CSI preprocessing must preserve experiment boundaries. The Figshare wificsi1 item reports a CC0 license; license/provenance should therefore be recorded at item/file level rather than assuming one license for every collection component.

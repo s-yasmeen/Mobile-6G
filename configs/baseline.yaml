@@ -1,0 +1,11 @@
+seed: 42
+n_samples: 3000
+n_features: 32
+n_activities: 4
+n_identities: 8
+release_counts: [1, 2, 5, 10, 20]
+privacy:
+  allow_auc_max: 0.60
+  block_auc_min: 0.75
+utility:
+  min_macro_f1: 0.70

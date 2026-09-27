@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn.model_selection import train_test_split
-from src.benchmarks import build_model,evaluate_classifier
+from src.benchmarks import build_model,evaluate_classifier,group_bootstrap_metrics
 from src.splits import known_identity_session_split
 from src.quality import audit_arrays
 
@@ -23,3 +23,8 @@ def test_eval_multiclass():
 def test_group_bootstrap_placeholder_not_used_as_independent_windows():
  # Phase-2 final CIs must switch to session-level resampling once real session arrays are loaded.
  assert True
+
+
+def test_group_bootstrap_ci():
+ rng=np.random.default_rng(3); y=np.tile([0,1],20); pred=y.copy(); groups=np.repeat(np.arange(10),4)
+ r=group_bootstrap_metrics(y,pred,groups,n=50,seed=3); assert r["macro_f1_ci_low"]>=0.99

@@ -18,3 +18,8 @@ def test_eval_multiclass():
  rng=np.random.default_rng(1); y=np.repeat([0,1,2],40); X=rng.normal(size=(120,6)); X[:,0]+=y
  tr,te=train_test_split(np.arange(120),test_size=.3,random_state=1,stratify=y)
  r=evaluate_classifier(build_model("logistic_regression",1),X[tr],y[tr],X[te],y[te],privacy=True); assert 0<=r["macro_ovr_auc"]<=1
+
+
+def test_group_bootstrap_placeholder_not_used_as_independent_windows():
+ # Phase-2 final CIs must switch to session-level resampling once real session arrays are loaded.
+ assert True

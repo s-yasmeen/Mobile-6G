@@ -16,3 +16,7 @@ This is deliberately not marked as a completed empirical study. The official OPE
 
 ## Non-negotiable publication rule
 No synthetic CI/smoke output may appear in a manuscript result table. Phase 2 becomes empirically COMPLETE only after official-data outputs satisfy the protocol and are reviewed for leakage, class support, session coverage and convergence.
+
+
+## WiMANS execution gate
+Official annotation and benchmark code have been inspected. The authors define identity as a six-element presence vector over anonymized user slots, not a scalar identity column. The Phase-2 primary benchmark therefore uses the pre-specified single-user subset, where the occupied slot is an unambiguous closed-set identity and its activity is the utility label. The official GitHub repository does not contain the CSI amplitude binaries; it directs users to the official Kaggle dataset. Real WiMANS metrics remain pending until those official `.npy` files are staged.

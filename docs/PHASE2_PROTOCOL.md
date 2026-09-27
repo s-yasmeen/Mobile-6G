@@ -50,3 +50,7 @@ No universal AUC value is declared privacy-safe. Statistical evidence is measure
 
 ### WiMANS — executable joint-label benchmark
 WiMANS is added as an executable Phase-2 dataset because its official release provides preprocessed CSI amplitude samples and annotations for identity, location and activity on the same benchmark corpus. Activity is the utility target and anonymized user identity is the privacy target. Results must be reported as Wi-Fi CSI evidence for next-generation sensing privacy, not mislabeled as native 6G measurements. OPERAnet and mmHSense retain their independent-validation/ISAC roles.
+
+
+#### WiMANS Phase-2 primary restriction
+The primary WiMANS K=1 experiment is restricted a priori to `number_of_users == 1`. Identity is the occupied anonymized user slot (1..6), matching the authors' `encode_identity` semantics; activity is the corresponding occupied user's activity. This avoids collapsing the native multi-label identity/activity problem into an invalid multiclass target. The authors' published benchmark uses a random 80/20 split; our primary inference will report the split protocol explicitly and will not claim session-disjoint generalization because WiMANS does not publish a session identifier in `annotation.csv`. Environment/band-stratified sensitivity analyses should be reported separately where sample support permits.

@@ -41,12 +41,15 @@ def parse_recording_path(value: Any) -> dict[str, str | None]:
 
 
 def choose_join_key(left: pd.DataFrame, right: pd.DataFrame) -> str | None:
-    """Choose a shared stable key only when both tables contain it."""
+    """Choose the first shared key with actual overlap; never assume alignment."""
     for key in KEY_CANDIDATES:
-        if key in left.columns and key in right.columns:
+        if key not in left.columns or key not in right.columns:
+            continue
+        left_values = set(left[key].dropna().astype(str))
+        right_values = set(right[key].dropna().astype(str))
+        if left_values & right_values:
             return key
     return None
-
 
 def summarize_metadata(path: Path) -> dict[str, Any]:
     frame = pd.read_csv(path)

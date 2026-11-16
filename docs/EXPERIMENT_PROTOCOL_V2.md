@@ -25,17 +25,17 @@ Retain at minimum:
 - `identity`: pseudonymous participant/device label, as appropriate to the threat model.
 - `activity`: sensing task label.
 - numeric features or raw CSI-derived representations.
-- `session`: acquisition session identifier.
-- `timestamp` or ordered sample index.
+- `session`: acquisition session identifier, where available.
+- `timestamp` or original ordered sample index.
 - `environment`, `device`, `radio` where available.
 
 Before model fitting:
 1. Check duplicate rows, missing labels, timestamp monotonicity and sample/window overlap.
 2. Keep participant IDs pseudonymous; do not commit raw participant data.
 3. Fit scalers, feature selection and sanitizers only on training data.
-4. Create sequence windows within participant-session boundaries; never concatenate across session breaks.
+4. Create sequence windows within participant-session or recording boundaries; never concatenate across acquisition breaks.
 5. Use a session-disjoint split within each participant when the goal is known-user re-identification across sessions. The same enrolled identities may occur in train and test, but sessions/time windows must be disjoint.
-6. If the dataset has only one session per participant, do not claim cross-session identity generalization. Use an explicitly different protocol (e.g., within-session chronological holdout with a purge gap) and report its limitation.
+6. If a dataset has only one recording/session per participant, do not claim cross-session identity generalization. Use a documented chronological within-recording holdout with a purge gap only if original sample ordering and recording boundaries are available; report this as a weaker protocol.
 7. For unseen-identity evaluation, use open-set verification or retrieval metrics; a closed-set classifier cannot classify identity classes absent from training.
 
 ## 5. Threat model
@@ -128,7 +128,7 @@ Do not sum ROC-AUC values. Report:
 - test threshold calibration sensitivity;
 - compare online update cost with batch sequence inference.
 
-## 11. Dataset admission checklist
+## 11. Dataset admission and protocol mapping
 
 A dataset is admitted only after confirming:
 - official repository/publisher page and stable citation;
@@ -136,13 +136,25 @@ A dataset is admitted only after confirming:
 - raw signal or feature access;
 - identity/participant labels;
 - task labels;
-- session/timestamp/order fields;
+- session/timestamp/order fields or an explicitly justified within-recording split;
 - sufficient repeated observations per identity;
 - acquisition conditions and device metadata;
 - no prohibited redistribution;
 - reproducible preprocessing.
 
-Current repository candidates mmHSense and OPERAnet remain unverified until these checks pass. Alternatives surfaced by literature search include WiMANS, EHUNAM, eHealth CSI, the 80-MHz CSI dataset, WiStride, ElderAL-CSI, SHARP-80 and CSI-based Device-free Localization and Obfuscation. Select one primary dataset and one independent validation dataset based on actual files and annotations.
+### mmHSense (primary candidate)
+
+The 2026 IEEE Access paper and official code repository are verified. The mmW-GaitID dataset targets person identification and reports 20 participants across a three-day collection campaign, with 60-GHz CSI at 10 Hz and a matched 5-GHz CSI modality. The public example loader exposes combined data and labels but does not expose session/day/timestamp metadata. Inspect the actual DataPort archive and labels before choosing a split. Do not assume that three collection days mean each participant has multiple sessions.
+
+mmW-Loc is a separate 20-participant localization-fingerprinting task on a 4×5 grid and may support a location-privacy sub-study, but its task labels and threat model must be kept distinct from person identification.
+
+### OPERAnet (secondary candidate)
+
+The 2022 Scientific Data paper documents approximately eight hours of synchronized RF and vision measurements across two rooms, six participants and six activities, with WiFi CSI, passive WiFi radar, UWB and Kinect modalities. It is a useful independent RF activity/localization dataset. Verify participant-ID labels and sequence/session structure from the downloadable files before using it for identity re-identification. Its small participant count limits identity-generalisation claims.
+
+### Other candidates
+
+WiMANS, EHUNAM, eHealth CSI, the 80-MHz WiFi CSI dataset, WiStride, ElderAL-CSI, SHARP-80 and CSI-based Device-free Localization and Obfuscation remain secondary options pending file/licence/label verification.
 
 ## 12. Reproducibility artifacts
 

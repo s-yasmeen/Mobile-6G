@@ -170,3 +170,31 @@ Each run must save:
 - commit SHA.
 
 Never commit raw participant data or sensitive identifiers.
+
+
+## 13. Updated dataset strategy: CSI-Bench as primary candidate
+
+The NeurIPS 2025 CSI-Bench benchmark is now the preferred primary candidate, subject to data-rights and metadata qualification. The paper reports over 461 hours, 35 users, 26 environments and 16 device types, with a multitask dataset carrying user identity, activity and proximity annotations. The current author repository documents per-recording paths with user, activity, environment, device and session timestamp components, metadata CSVs and split manifests.
+
+Before any experiment:
+1. Verify the Kaggle dataset terms independently of the code repository's MIT licence.
+2. Inspect the latest archive/version and all three multitask metadata tables.
+3. Verify that UID/HAR/proximity rows refer to the same observations using common stable IDs or exact resolved file paths. A shared column name alone is not proof of alignment.
+4. Check duplicate keys, one-to-many mappings, label consistency and file availability.
+5. Confirm the number of genuine session groups per user and whether the official split definitions overlap sessions.
+6. Preserve official splits for baseline reproduction; use additional session/device/environment holdouts for the proposed privacy experiments and document their construction.
+
+Run the diagnostic:
+```bash
+python experiments/qualify_csi_bench.py --root /path/to/CSI-Bench
+```
+It is inspection-only and deliberately returns a NOT_ADMITTED decision. Review its JSON report before creating a feature table.
+
+The public benchmark project page reports high in-distribution user-identification performance. Those are dataset-author baseline results, not results of this project. The current author repository also documents cross-device and cross-environment evaluations. Use these only as motivation and reproduce them from the current archive before quoting exact values.
+
+### Secondary datasets
+
+- mmHSense: use mmW-GaitID and mmW-Loc as separate mmWave/ISAC replications. Collection across several days does not prove repeated per-user sessions.
+- OPERAnet: use for secondary RF activity/localization sensitivity analysis; its participant count is small for identity-generalization claims.
+
+No raw archive is currently present in this repository workspace. Therefore, the session-aware runner remains a protocol implementation awaiting a dataset-specific adapter and real-data validation.

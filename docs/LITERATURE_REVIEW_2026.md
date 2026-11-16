@@ -22,7 +22,7 @@ This is a targeted evidence scan using SciSpace discovery/extraction and indepen
 
 ## Official standards and governance context
 
-- ETSI GR ISC 004 V1.1.1 (March 2026) addresses security, privacy, trustworthiness and sustainability for 6G ISAC, including unauthorized sensing, consent, transparency and sensing-data handling. Use it to ground system requirements and threat assumptions.
+- ETSI GR ISC 004 V1.1.1 (March 2026) addresses security, privacy, trustworthiness and sustainability for 6G ISAC, including unauthorized sensing, consent, transparency and sensing-data handling.
 - Do not imply that this prototype is a 3GPP- or ETSI-compliant implementation. It is a research framework informed by standards discussions.
 
 ## Preliminary research gap (must be validated)
@@ -36,21 +36,39 @@ The paper must demonstrate all three:
 2. **Cumulative risk measure:** report adversarial success/posterior risk or a defensible information measure over the complete sequence. Do not add AUC values or call AUC itself a formal privacy budget.
 3. **Adaptive policy value:** show that release-history-aware control improves the privacy–utility–cost frontier against fixed and per-release baselines under the same attacker and data splits.
 
-## Candidate datasets: verification status
+## Dataset qualification: verified starting point
 
-The repository currently names mmHSense and OPERAnet, but this evidence scan did not establish authoritative dataset records, data dictionaries, identity labels, session structure, licences or reproducible download instructions for either. Treat both as **unverified candidates**, not confirmed experimental inputs.
+### Primary candidate: mmHSense
 
-SciSpace surfaced potentially relevant alternatives:
-- WiMANS: multi-user WiFi activity sensing; verify whether identity labels and raw CSI are available for the required attack.
-- EHUNAM: WiFi CSI for human and machine sensing; verify participant/session annotations and licence.
-- eHealth CSI: reported as involving more than 100 participants; verify exact data modalities, consent/usage terms and identity labels.
-- 80-MHz WiFi CSI dataset: reports 13 subjects across environments, days and hardware; verify release files and licence.
-- WiStride, ElderAL-CSI and SHARP-80: mentioned in a 2026 evaluation audit; verify original dataset pages and access terms.
-- CSI-based Device-free Localization and Obfuscation dataset: includes CSI traces and obfuscation conditions; verify identity labels and licence.
+The mmHSense paper and public code/data entry have now been verified:
+- Six labeled mmWave ISAC datasets are provided for gesture recognition, pose estimation, localization and person identification.
+- The mmW-GaitID task is directly relevant to identity inference: the paper reports 20 participants, collection over three days, 60-GHz CSI at 10 Hz, and a paired 5-GHz CSI modality.
+- The paper reports approximately 26,000 60-GHz CSI samples per device pair and describes an evaluation representation of 1,318 examples with 60 concatenated features and 20 time steps.
+- The companion code identifies mmW-GaitID as a 20-class classification task and provides a loader for the combined tensors.
+- The paper also documents mmW-Loc with 20 participants and a 4×5 localization grid, potentially useful for location privacy experiments.
+- The dataset paper is IEEE Access (2026), DOI 10.1109/ACCESS.2026.3691174. The code repository states CC BY 4.0 and links to IEEE DataPort.
+
+**Important qualification:** the public example loader returns combined data and labels, but does not expose session/day/timestamp metadata in its simple interface. The paper says collection spans three days, but this alone does not prove repeated sessions for the same participant. Before using the new session-disjoint runner, inspect the raw archive and metadata. If per-participant session labels are absent, use a documented chronological within-recording split with a purge gap only if original ordering can be reconstructed; otherwise restrict claims to the split the dataset actually supports. Do not manufacture session labels.
+
+### Secondary candidate: OPERAnet
+
+OPERAnet is verified as an open-access Scientific Data dataset (2022), DOI 10.1038/s41597-022-01573-2:
+- approximately eight hours of synchronized measurements;
+- two rooms and six participants;
+- six daily activities;
+- WiFi CSI, passive WiFi radar, UWB and Kinect modalities;
+- high-temporal-resolution activity and location annotations;
+- CC BY 4.0 publication licence.
+
+OPERAnet is useful as an independent RF/multimodal activity and localization validation dataset. Its six-participant scale is limited, and participant identity-label availability and sequence/session mapping must be confirmed from the actual files before treating it as an identity re-identification benchmark.
+
+### Additional candidate datasets
+
+SciSpace surfaced WiMANS, EHUNAM, eHealth CSI, an 80-MHz WiFi CSI dataset, WiStride, ElderAL-CSI, SHARP-80 and CSI-based Device-free Localization and Obfuscation. These remain secondary candidates pending verification of original files, licences, participant/session labels and temporal ordering.
 
 Dataset selection must be based on actual downloadable files, label availability, participant/session structure, consent and licence, not paper abstracts alone. Do not combine datasets with incompatible label semantics into a single pooled benchmark without a justified harmonization protocol.
 
-## Bibliographic starting points
+## Bibliographic and dataset starting points
 
 - Operational leakage metric: https://arxiv.org/abs/2609.27527
 - Constellation shaping: https://arxiv.org/abs/2609.25103
@@ -59,11 +77,15 @@ Dataset selection must be based on actual downloadable files, label availability
 - ISAC privacy via signal indistinguishability: https://doi.org/10.1109/TCCN.2026.3704837
 - Transparent artificial multipath: https://doi.org/10.1109/TWC.2026.3733285
 - ISAC security/privacy survey: https://doi.org/10.1186/s13634-025-01277-w
-- ETSI GR ISC 004 news/overview: https://www.etsi.org/newsroom/news/2647-report-6g-isac-security-privacy-sustainability/
+- ETSI GR ISC 004 overview: https://www.etsi.org/newsroom/news/2647-report-6g-isac-security-privacy-sustainability/
+- mmHSense paper: https://doi.org/10.1109/ACCESS.2026.3691174
+- mmHSense code and IEEE DataPort link: https://github.com/nisarnabeel/Multi-Modal-and-Distributed-mmWave-ISAC-Datasets-for-Human-Sensing
+- OPERAnet paper and dataset details: https://doi.org/10.1038/s41597-022-01573-2
 
 ## Required next literature-review actions
 
 1. Retrieve and read full texts for the direct-overlap papers (adaptive DP feature release, operational leakage, temporal-correlation location privacy, private-attribute leakage).
 2. Extract equations, threat models, release assumptions, baselines, datasets, and limitations into a verified matrix.
-3. Search citation chains and related work for sequential/compositional leakage in RF sensing, CSI, localization, ISAC and privacy-preserving feature release.
-4. Record inclusion/exclusion criteria and search dates before describing the review as systematic.
+3. Inspect the downloaded mmHSense and OPERAnet archives and metadata to determine whether session-aware evaluation is possible.
+4. Search citation chains and related work for sequential/compositional leakage in RF sensing, CSI, localization, ISAC and privacy-preserving feature release.
+5. Record inclusion/exclusion criteria and search dates before describing the review as systematic.

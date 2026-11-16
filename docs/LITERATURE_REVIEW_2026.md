@@ -89,3 +89,38 @@ Dataset selection must be based on actual downloadable files, label availability
 3. Inspect the downloaded mmHSense and OPERAnet archives and metadata to determine whether session-aware evaluation is possible.
 4. Search citation chains and related work for sequential/compositional leakage in RF sensing, CSI, localization, ISAC and privacy-preserving feature release.
 5. Record inclusion/exclusion criteria and search dates before describing the review as systematic.
+
+
+## Addendum — newer direct-overlap evidence and dataset reprioritization (16 Nov 2026)
+
+### Directly relevant 2025–2026 studies
+
+- *Differentially Private Feature Release for Wireless Sensing: Adaptive Privacy Budget Allocation on CSI Spectrograms* (2025 preprint) already proposes clipping, calibrated Gaussian noise, adaptive blockwise privacy-budget allocation, RDP composition accounting and identity/membership inference evaluation. Its reported guarantee is sample-level DP; user-level protection requires separate grouping/accounting. This is a direct comparator, not a gap we can claim to have invented.
+- *An Operational Leakage Metric for Eavesdropping in Joint Sensing and Communications Systems* (2026) proposes finite-record Bayesian operational leakage and explicitly distinguishes prior adversarial side information from observation-driven success. The new paper must therefore focus on sequential sensing prefixes and empirical dataset-grounded attacks, not simply a Bayesian leakage scalar.
+- *Learning Identity Beyond Activity: Open-Set User Verification with WiFi CSI* (2026) frames CSI identity inference as pairwise verification and reports central-holdout and leave-one-subject-out protocols. Closed-set identification and open-set verification must remain separate tasks in our evaluation.
+- *Resource-Efficient Wi-Fi CSI-Based Sensing via Exploiting the Age of Samples* (2026) studies age-aware sensing under sparse/irregular CSI reporting. Our release model should preserve timestamps or sample ages and include staleness/packet-gap sensitivity tests.
+- *Adaptive Privacy of Sequential Data Releases Under Collusion* (2026) further confirms that adaptive sequential privacy and colluding recipients are established topics outside wireless sensing. The contribution must be domain- and protocol-specific.
+
+### Dataset priority change: CSI-Bench
+
+CSI-Bench (NeurIPS 2025 Datasets and Benchmarks Track) is now the preferred primary candidate over mmHSense because its described data scale and labels are better aligned with the core experiment: more than 461 hours, 35 users, 26 environments, 16 device types, and a multitask component with identity, activity and proximity annotations. Its documented directory structure includes user/activity/environment/device/session path components and metadata/split files.
+
+- NeurIPS paper: https://proceedings.neurips.org/paper_files/paper/2025/hash/f7c68372b3d39e8d7a093eb2edaaad87-Abstract-Datasets_and_Benchmarks_Track.html
+- Project page: https://ai-iot-sensing.github.io/projects/project.html
+- Author code repository: https://github.com/guozhen-jenn-zhu/CSI-Bench-Real-WiFi-Sensing-Benchmark
+- Dataset access page: https://www.kaggle.com/datasets/guozhenjennzhu/csi-bench
+
+The project page reports high user-identification performance on its in-distribution benchmark. These are author-reported results and must not be presented as results produced by CLAPA. The author repository reports additional cross-device/environment splits; reproduce and verify those results against the current dataset version before quoting exact values.
+
+The code repository has an MIT licence, but this does not establish the dataset's licence. The Kaggle dataset terms must be checked independently. A diagnostic utility, `experiments/qualify_csi_bench.py`, has been added to inspect metadata columns, label counts, common-key overlap, file references and explicit path-derived user/session structure. Its output is not an admission approval: the researcher must manually review the report and verify data terms, duplicates and label semantics.
+
+### Updated research position
+
+The strongest candidate contribution is an empirical system study of history-aware privacy–utility–cost control over sequential wireless sensing releases, with:
+1. sequence-prefix adversarial success and calibration rather than summed AUC;
+2. aligned identity and legitimate-task labels from the same records;
+3. held-out session, device and environment evaluation;
+4. fixed, current-release-only, history-aware and formally accounted DP comparators; and
+5. participant/session-level confidence intervals and runtime cost.
+
+Do not claim a new general theory of sequential privacy, a first Bayesian operational leakage metric, or formal DP. The literature review remains a targeted evidence scan, not a systematic review.

@@ -2,7 +2,7 @@
 
 Experimental prototype for studying **cumulative identity leakage from repeated RF/ISAC releases** and risk-adaptive ALLOW / SANITIZE / BLOCK control in next-generation mobile sensing networks.
 
-> Research status: the original synthetic pipeline supports smoke testing. A new session-disjoint chronological evaluation path is available in `experiments/run_sequence_protocol.py`. Neither path constitutes scientific validation until qualified real datasets are processed and experiments are run. The previously listed mmHSense and OPERAnet candidates still require verification of official records, labels, sessions, licences and access.
+> Research status: the original synthetic pipeline supports smoke testing. A new session-disjoint chronological evaluation path is available in `experiments/run_sequence_protocol.py`. Neither path constitutes scientific validation until qualified real datasets are processed and experiments are run. The mmHSense and OPERAnet publications and data sources are now verified; raw archive structure, identity labels, recording/session metadata and the correct evaluation split still require inspection.
 
 ## Hypothesis
 
@@ -45,10 +45,10 @@ python experiments/run_sequence_protocol.py --csv data/processed/features.csv --
 python experiments/run_sequence_protocol.py --csv data/processed/features.csv --sanitizer noise --strength 0.25
 ```
 
-This protocol evaluates **known-identity re-identification across held-out sessions**. Each identity must have at least two sessions. It constructs chronological sequences within identity-session boundaries and does not allow sessions to overlap across train/test. It is not an unseen-identity open-set protocol.
+This protocol evaluates **known-identity re-identification across held-out sessions**. Each identity must have at least two sessions. It constructs chronological sequences within identity-session boundaries and does not allow sessions to overlap across train/test. It is not an unseen-identity open-set protocol. If the downloaded source dataset does not expose repeated sessions per identity, do not manufacture session labels; use a justified within-recording chronological split only if original order can be reconstructed.
 
 See:
-- `data/README.md` for the data contract.
+- `data/README.md` for verified mmHSense and OPERAnet sources and the data contract.
 - `docs/EXPERIMENT_PROTOCOL_V2.md` for threat model, split rules, metrics, baselines and statistical design.
 - `docs/LITERATURE_REVIEW_2026.md` for the preliminary evidence scan.
 - `docs/RESEARCH_DEVELOPMENT_PLAN.md` for the work packages and publication roadmap.

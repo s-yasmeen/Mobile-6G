@@ -45,3 +45,9 @@ def test_summarize_metadata_counts_session_groups(tmp_path: Path):
     assert result["rows"] == 3
     assert result["path_users_with_multiple_sessions"] == 1
     assert result["path_user_session_pairs"] == 3
+
+
+def test_choose_join_key_falls_back_when_sample_ids_do_not_overlap():
+    left = pd.DataFrame({"sample_id": ["uid-1"], "file_path": ["shared/a.h5"]})
+    right = pd.DataFrame({"sample_id": ["har-9"], "file_path": ["shared/a.h5"]})
+    assert choose_join_key(left, right) == "file_path"

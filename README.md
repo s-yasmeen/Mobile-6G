@@ -77,10 +77,10 @@ Raw third-party datasets are deliberately excluded from this repository.
 
 ## Repository map
 
-- `src/`: data, privacy, metrics, risk gate, sequence construction and synthetic validation
-- `experiments/`: runnable experiments and plotting
+- `src/`: data, privacy, metrics, risk gate, chronological sequence construction, and a history-aware candidate-selection policy
+- `experiments/`: runnable experiments, plotting and CSI-Bench archive qualification
 - `configs/`: baseline thresholds/configuration
-- `tests/`: core and sequence protocol tests
+- `tests/`: core, sequence protocol, CSI-Bench qualification and controller tests
 - `docs/`: literature review, experiment protocols and research plan
 - `.github/workflows/ci.yml`: reproducibility checks
 

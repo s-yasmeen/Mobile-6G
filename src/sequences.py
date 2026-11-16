@@ -23,6 +23,7 @@ def split_sessions_by_identity(
     missing = {identity_col, session_col} - set(frame.columns)
     if missing:
         raise ValueError(f"Missing required columns: {sorted(missing)}")
+    frame = frame.reset_index(drop=True)
     if frame[[identity_col, session_col]].isna().any().any():
         raise ValueError("Identity and session labels must not be missing")
 
@@ -30,8 +31,7 @@ def split_sessions_by_identity(
     train_positions: list[int] = []
     test_positions: list[int] = []
 
-    # sort=False preserves first-seen identity order; RNG seed makes assignments reproducible.
-    for _, group in frame.groupby(identity_col, sort=False):
+    for _, group in frame.groupby(identity_col, sort=True):
         sessions = pd.unique(group[session_col])
         if len(sessions) < 2:
             raise ValueError(
@@ -90,7 +90,7 @@ def build_sequences(
     sessions: list[object] = []
     ordered = frame.copy()
 
-    for (identity, session), group in ordered.groupby([identity_col, session_col], sort=False):
+    for (identity, session), group in ordered.groupby([identity_col, session_col], sort=True):
         if timestamp_col in group.columns:
             group = group.sort_values(timestamp_col, kind="mergesort")
         values = group[feature_cols].to_numpy(dtype=float)

@@ -2,7 +2,7 @@
 
 Experimental prototype for studying **cumulative identity leakage from repeated RF/ISAC releases** and risk-adaptive ALLOW / SANITIZE / BLOCK control in next-generation mobile sensing networks.
 
-> Research status: the original synthetic pipeline supports smoke testing. A new session-disjoint chronological evaluation path is available in `experiments/run_sequence_protocol.py`. Neither path constitutes scientific validation until qualified real datasets are processed and experiments are run. The mmHSense and OPERAnet publications and data sources are now verified; raw archive structure, identity labels, recording/session metadata and the correct evaluation split still require inspection.
+> Research status: synthetic data is for software smoke tests only. The preferred primary dataset candidate is now CSI-Bench (NeurIPS 2025), with mmHSense and OPERAnet as secondary candidates. `experiments/qualify_csi_bench.py` audits metadata alignment and recording/session structure after a licensed local dataset copy is available. No CLAPA real-data experiment has yet been run; no empirical CLAPA result is claimed.
 
 ## Hypothesis
 
@@ -50,6 +50,8 @@ This protocol evaluates **known-identity re-identification across held-out sessi
 See:
 - `data/README.md` for verified mmHSense and OPERAnet sources and the data contract.
 - `docs/EXPERIMENT_PROTOCOL_V2.md` for threat model, split rules, metrics, baselines and statistical design.
+- `docs/RESEARCH_GAP_AND_CONTRIBUTION.md` for the direct-overlap audit, strengthened research gap, dataset priority and go/no-go gates.
+- `experiments/qualify_csi_bench.py` to inspect CSI-Bench metadata and verify UID/HAR/proximity record alignment before experiments.
 - `docs/LITERATURE_REVIEW_2026.md` for the preliminary evidence scan.
 - `docs/RESEARCH_DEVELOPMENT_PLAN.md` for the work packages and publication roadmap.
 

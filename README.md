@@ -51,6 +51,7 @@ See:
 - `data/README.md` for verified mmHSense and OPERAnet sources and the data contract.
 - `docs/EXPERIMENT_PROTOCOL_V2.md` for threat model, split rules, metrics, baselines and statistical design.
 - `docs/RESEARCH_GAP_AND_CONTRIBUTION.md` for the direct-overlap audit, strengthened research gap, dataset priority and go/no-go gates.
+- `docs/DATASET_DISCOVERY_2026.md` records the expanded public-data search and the recommended order: EHUNAM first joint identity/activity pilot, CSI-Bench for scale, CSI-GaitCov for identity/covariate replication, and mmHSense for ISAC transfer.
 - `experiments/qualify_csi_bench.py` to inspect CSI-Bench metadata and verify UID/HAR/proximity record alignment before experiments.
 - `docs/LITERATURE_REVIEW_2026.md` for the preliminary evidence scan.
 - `docs/RESEARCH_DEVELOPMENT_PLAN.md` for the work packages and publication roadmap.

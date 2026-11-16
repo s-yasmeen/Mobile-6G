@@ -31,6 +31,13 @@ def test_split_sessions_disjoint_and_identity_preserved():
     assert set(frame.iloc[test].identity) == set(frame.identity)
 
 
+def test_split_sessions_returns_positions_for_non_range_index():
+    frame = make_frame()
+    frame.index = np.arange(len(frame)) + 100
+    train, test = split_sessions_by_identity(frame, seed=7)
+    assert max(train.max(), test.max()) < len(frame)
+
+
 def test_split_requires_two_sessions_per_identity():
     frame = make_frame()
     frame = frame[~((frame.identity == "p2") & (frame.session == "s2"))]
@@ -43,7 +50,6 @@ def test_sequences_are_ordered_and_never_cross_session():
     X, task, identity, session = build_sequences(frame, ["f1", "f2"], k=2)
     assert X.shape[1] == 2 * 2 + 3 * 2
     assert len(X) == len(task) == len(identity) == len(session)
-    # For a 2-row sequence the first two feature rows are concatenated in timestamp order.
     assert np.allclose(X[0][:4], [0.0, 0.0, 1.0, 1.0])
 
 

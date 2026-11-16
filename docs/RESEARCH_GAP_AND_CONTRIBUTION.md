@@ -179,3 +179,15 @@ The controller should receive a calibrated estimate of adversarial success for t
 - Formal privacy guarantee: none.
 
 The correct next milestone is dataset qualification, not writing a results section with synthetic or borrowed benchmark numbers.
+
+
+## 9. Controller implementation status
+
+A first policy primitive is now implemented in `src/history_controller.py`. It accepts candidate ALLOW/SANITIZE assessments containing:
+- calibrated adversarial success risk for the **complete candidate release prefix**;
+- estimated legitimate-task utility; and
+- estimated latency.
+
+It rejects candidates that violate configured risk, utility or latency constraints, then selects the feasible candidate with the lowest weighted objective. It tracks the last accepted prefix risk and penalizes positive risk growth. It does **not** sum AUC values or per-release risk scores.
+
+This is a policy selector only. It does not train or calibrate the attacker, generate candidate sanitizer assessments, establish DP, or prove a privacy bound. Those estimates must be generated from a validation-only pipeline and then evaluated on held-out data. The controller has unit tests; CI must be checked on the latest commit before the code is described as validated.

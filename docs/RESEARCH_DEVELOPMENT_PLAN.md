@@ -15,20 +15,21 @@ The existing Mobile-6G repository contains:
 - identity aggregation by non-overlapping mean blocks;
 - an identity attacker and activity utility classifier;
 - a threshold-based ALLOW/SANITIZE/BLOCK gate;
-- a cumulative experiment script and plotting pipeline.
+- a cumulative experiment script and plotting pipeline;
+- a new session-disjoint chronological sequence builder and experiment runner on the research branch.
 
-The README correctly warns that synthetic data is only for smoke testing and that real data is required for scientific claims.
+The original synthetic pipeline remains useful for software smoke testing only. No real-data experiment has yet been run.
 
 ## Audit findings requiring action
 
-1. The current experiment uses random observation-level train/test splitting. This risks train/test contamination from correlated windows and sessions.
-2. The data loader discards session and timestamp metadata.
-3. Aggregation is based on sorted identity subsets, not a verified chronological sequence protocol.
+1. The original experiment uses random observation-level train/test splitting. This risks train/test contamination from correlated windows and sessions.
+2. The original data loader discards session and timestamp metadata.
+3. Original aggregation is based on sorted identity subsets, not a verified chronological sequence protocol.
 4. The current privacy score is ROC-AUC. AUC is an attacker-performance metric, not a composable privacy budget and should not be added across releases.
-5. Sanitization is applied to the full feature matrix before the split. Any data-dependent sanitizer or calibration would risk test-set leakage; fit parameters on training data only.
+5. Sanitization is applied to the full feature matrix before the split in the original runner. Any data-dependent sanitizer or calibration would risk test-set leakage; fit parameters on training data only.
 6. Thresholds in baseline.yaml are fixed constants and need validation-only calibration plus sensitivity analysis.
-7. Dataset references mmHSense and OPERAnet have not yet been verified against official dataset records, data dictionaries, licences and required labels.
-8. The current script should remain labelled exploratory until the protocol and data adapter are corrected.
+7. mmHSense and OPERAnet are now verified publications/datasets, but raw-file metadata must still be inspected before the session-disjoint protocol can be applied. The mmHSense example loader does not expose session/day/timestamp fields; OPERAnet participant-ID and session mapping also need confirmation.
+8. The current new runner is a first protocol implementation and has not yet been executed against the actual datasets or validated by CI. Do not present it as a completed scientific experiment.
 
 ## Proposed contribution
 
@@ -58,9 +59,10 @@ The novelty claim must be narrowed after full-text comparison with adaptive DP f
 - Produce a novelty statement supported by the matrix.
 
 ### WP2 — Dataset qualification
-- Verify mmHSense and OPERAnet or replace them with qualified public datasets.
+- Use mmHSense mmW-GaitID as the primary identity-inference candidate, subject to raw archive and label inspection.
+- Use OPERAnet as a secondary RF activity/localization validation candidate, subject to participant-ID and session-label verification.
+- Determine whether true per-participant session splits are supported. If not, implement and clearly label a chronological within-recording split with a purge gap, only where acquisition ordering permits it.
 - Check licence, participant/session labels, timestamp order, signal modality and repeated-release suitability.
-- Choose one primary and one external validation dataset.
 - Document preprocessing and feature extraction.
 
 ### WP3 — Mathematical formulation
@@ -74,8 +76,8 @@ This is a design template, not yet a proved guarantee. Derive assumptions and an
 
 ### WP4 — Algorithm and implementation
 - preserve metadata through the data pipeline;
-- implement chronological sequence construction within sessions;
-- implement session-aware splits and leakage checks;
+- implement chronological sequence construction within recording/session boundaries;
+- implement leakage-resistant splits and explicit purge gaps;
 - add sequence attacker baselines;
 - implement history-aware state and controller;
 - calibrate thresholds only on validation data;
@@ -102,6 +104,6 @@ This is a design template, not yet a proved guarantee. Derive assumptions and an
 - Do not present synthetic smoke tests as scientific validation.
 - Do not call AUC a cumulative privacy budget.
 - Do not claim formal DP unless its mathematical requirements and accountant are implemented.
-- Do not call Wi-Fi/5G data native 6G measurements.
+- Do not call Wi-Fi/5G measurements native 6G data.
 - Clearly distinguish preprints, conference papers, journal articles and standards documents.
 - Preserve raw dataset licensing and participant privacy.

@@ -107,3 +107,10 @@ This is a design template, not yet a proved guarantee. Derive assumptions and an
 - Do not call Wi-Fi/5G measurements native 6G data.
 - Clearly distinguish preprints, conference papers, journal articles and standards documents.
 - Preserve raw dataset licensing and participant privacy.
+
+
+## Controller prototype added
+
+A first history-aware action selector is now available in `src/history_controller.py`, with tests in `tests/test_history_controller.py`. It selects among ALLOW/SANITIZE candidates using full-prefix calibrated risk, utility and latency constraints, with a penalty for increases relative to the last accepted prefix risk. It deliberately does not sum AUC values or per-release risk estimates.
+
+This does not yet complete the end-to-end adaptive experiment: a dataset-specific adapter must produce aligned records, a validation-only attacker/calibration pipeline must score each candidate transformation over the full prefix, and the experiment runner must connect those candidate assessments to the controller. No empirical policy comparison has been run.
